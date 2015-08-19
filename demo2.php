@@ -9,10 +9,13 @@ $campus, $closed) {
 		#array course_1 making each element an array of its own
     	if (empty($course_combos)) {
      	   for ($i = 0; $i < count($course_1); $i=$i+1) {
-			 if (time_day_constraint($course_1[$i], $limit, $from, $to) == true)
-    	        if (campus_check($campus, $course_1[$i]) == true)
-					if (closed_check($closed, $course_1[$i]) == true)
+			 if (time_day_constraint($course_1[$i], $limit, $from, $to) == true) {
+    	        if (campus_check($campus, $course_1[$i]) == true) {
+					if (closed_check($closed, $course_1[$i]) == true) {
 						array_push($new_combos, array($course_1[$i]));
+					}
+				}
+			}
     	   }
 			$count = 1;
 		}
@@ -32,15 +35,18 @@ $campus, $closed) {
 							}
 						}
                 	}
-					else
+					else {
 						echo "OVERLAP!\n";
+					}
     	        }
 			}
 		}
-		if ($count != 0)
+		if ($count != 0) {
 			return $new_combos;
-		else
+		}
+		else {
 			return $course_combos;
+		}
 	}
 
 	#converts time in military time
@@ -49,61 +55,76 @@ $campus, $closed) {
         $time12hour = substr($time12hour, 0, count($time12hour) - 3);
         $minutes = intval(split(":", $time12hour)[1]);
         $hour = 100*intval(split(":", $time12hour)[0]);
-        if (($tail == "am"&&$hour != 1200)||($tail == "pm"&&$hour == 1200))
+        if (($tail == "am"&&$hour != 1200)||($tail == "pm"&&$hour == 1200)){
             $time = $hour+$minutes;
-        else
+		}
+        else {
             $time = $hour+$minutes+1200;
+		}
         return $time;
     }
 
 	#compares days to see if there are any overlapping days
     function cmp_days($str1, $str2) {
-		if ($str1 == "TBD" || $str2 == "TBD")
+		if ($str1 == "TBD" || $str2 == "TBD") {
 			return false;
+		}
         $len1 = strlen( $str1 );
         $len2 = strlen( $str2 );
         for ($i = 0; $i < $len1; $i = $i + 1) {
             for ($j = 0; $j < $len2; $j = $j + 1) {
-                if ($str1[$i] == $str2[$j])
+                if ($str1[$i] == $str2[$j]) {
                     return true;
+				}
             }
         }
         return false;
     }
 
 	function time_day_constraint($course, $limit, $from, $to) {
-		if (cmp_days($limit, $course->days) == false)
+		if (cmp_days($limit, $course->days) == false) {
 			return true;
-		else if ($from == "" || $to == "")
+		}
+		else if ($from == "" || $to == "") {
 			return false;
+		}
 		else {
             $start = convert(split(" - ", $course->times)[0]);
             $end = convert(split(" - ", $course->times)[1]);
-			if (time_overlap($start, $end, $from, $to) == false)
+			if (time_overlap($start, $end, $from, $to) == false) {
 				return true;
-			else
+			}
+			else {
 				return false;
+			}
 		}
 	}
 
 	function campus_check($campus, $course) {
-		if ($campus == 0 || $campus == "")
+		if ($campus == 0 || $campus == "") {
 			return true;
-		else if ($campus == 1 && $course->campus == "Center City Campus")
+		}
+		else if ($campus == 1 && $course->campus == "University City Campus") {
 			return true;
-		else if ($course->campus == "" || $course->campus == "TBD")
+		}
+		else if ($course->campus == "" || $course->campus == "TBD") {
 			return true;
-		else return false;
+		}
+		else {
+			return false;
+		}
 	}
 
 	function closed_check($close, $course) {
-		if ($close == 1 || $close == "")
+		if ($close == 1 || $close == "") {
 			return true;
-		else if ($course->enrollment != "FULL")
+		}
+		else if ($course->enroll != "CLOSED") {
 			return true;
-		else if ($course->enrollment == "" || $course->enrollment == "TBD")
-			return true;
-		else return false;
+		}
+		else {
+			return false;
+		}
 	}
 
 	#checks if the times in military overlap
@@ -164,7 +185,7 @@ $campus, $closed) {
         var $times;
 		var $CRN;
 		var $campus;
-		var $enrollment;
+		var $enroll;
         public function __construct($name, $days, $times, $CRN, $campus,
 $closed) {
             $this->name = $name;
@@ -172,7 +193,7 @@ $closed) {
             $this->times = $times;
 			$this->CRN = $CRN;
         	$this->campus = $campus;
-			$this->enrollment = $closed;
+			$this->enroll = $closed;
 		}
         public function print_course() {
             echo "Name:$this->name\n";
@@ -180,50 +201,50 @@ $closed) {
             echo "Times:$this->times\n";
 			echo "CRN:$this->CRN\n";
 			echo "Campus:$this->campus\n";
-			echo "Enrollment:$this->enrollment\n";
+			echo "Enrollment:$this->enroll\n";
 			echo "------------------------------\n";
         }
     }
 
 	#create classes
     $ECE_lecture1 = new course("ECE 200 Lecture", "TR", "8:00 am - 8:50
-am", 1120, "Center City Campus", "OPEN");
+am", 1120, "University City Campus", 24);
     $ECE_lecture2= new course("ECE 200 Lecture", "TR", "10:00 am - 10:50
-am", 69,"Center City Campus", "OPEN");
+am", 69,"University City Campus", 11);
 	$ECE_lecture3 = new course("ECE 200 Lecture", "TR", "11:00 am - 11:50
-am", 34, "Center City Campus", "OPEN");
+am", 34, "University City Campus", 67);
 
     $ECE_lab1= new course("ECE 200 Lab", "W", "01:00 pm - 2:50 pm",
-3839,"Center City Campus", "OPEN");
+3839,"University City Campus", 78);
 	$ECE_lab2 = new course("ECE 200 Lab", "F", "1:00 pm - 2:50 pm", 34332,
-"Center City Campus", "FULL");
+"University City Campus", "CLOSED");
 
 	$FRENCH1011 = new course("FRENCH 101", "MWR", "9:00 am - 10:50 am",
-3454, "Burlington Campus", "OPEN");
+3454, "Burlington Campus", 12);
 	$FRENCH1012 = new course("FRENCH 101", "TWF", "3:00 pm - 4:20 pm", 8303,
-"Center City Campus", "OPEN");
+"University City Campus", 56);
 	$FRENCH1013 = new course("FRENCH 101", "R", "5:00 pm - 7:50 pm", 609,
-"Center City Campus", "FULL");
+"University City Campus", "CLOSED");
 
 	$CS2751 = new course("CS 275", "TR", "11:00 am - 12:20 pm", 6023,
-"Center City Campus", "OPEN");
+"University City Campus", 6);
 	$CS2752 = new course("CS 275", "TR", "12:30 pm - 1:50 pm", 7421,
-"Burlington Campus", "FULL");
+"Burlington Campus", "CLOSED");
 
 	$MATH2211 = new course("MATH 221", "MWF", "1:00 pm - 2:50 pm", 6970,
-"Center City Campus", "OPEN");
+"University City Campus", 34);
 	$MATH2212 = new course("MATH 221", "TR", "6:00 pm - 7:50 pm", 3242,
-"Burlington Campus", "OPEN");
+"Burlington Campus", 68);
 	$MATH2213 = new course("MATH 221", "MW", "6:00 pm - 7:50 pm",
-5644,"Center City Campus", "OPEN");
+5644,"University City Campus", 12);
 	$MATH2214 = new course("MATH 221", "MWF", "9:00 am - 9:50 am", 6578,
-"Burlington Campus", "FULL");
+"Burlington Campus", "CLOSED");
 
 	$CS2601 = new course("CS 260", "R","11:00 am - 1:50 pm", 325,
-"Sacramento Campus", "OPEN");
+"Sacramento Campus", 23);
 	$CS2602 = new course("CS 260", "M", "2:00 pm - 4:50 pm", 5765,
-"Center City Campus", "OPEN");
-    $CS2603 = new course("CS 260", "TBD", "", 83234, "No campus", "FULL");
+"University City Campus", 56);
+    $CS2603 = new course("CS 260", "TBD", "", 83234, "No campus", "CLOSED");
 
 	#Create an array for each different class
 	$list1 = array($ECE_lecture1, $ECE_lecture2, $ECE_lecture3);
@@ -254,8 +275,8 @@ am", 34, "Center City Campus", "OPEN");
 	echo "Ending time\n";
 	$to = read_stdin();
 
-	echo "Do you want it to be in Center City campus only or not\n";
-	echo "(1 for Center City campus 0 for all campuses)\n";
+	echo "Do you want it to be in University City campus only or not\n";
+	echo "(1 for University City campus 0 for all campuses)\n";
 	$campus = read_stdin();
 
 	echo "Do you want to allow closed classes or not\n";
@@ -263,14 +284,15 @@ am", 34, "Center City Campus", "OPEN");
 	$close = read_stdin();
 
 	#For loop to decipher the combinations
-	for ($i = 0; $i < count($list); $i = $i + 1)
-		$list_combos = multiply($list[$i], $list_combos, $from, $to, $limit,
-$campus, $close);
-
+	for ($i = 0; $i < count($list); $i = $i + 1) {
+		$list_combos = multiply($list[$i], $list_combos, $from, $to, $limit, $campus, $close);
+	}
 	$list_combos_final = array();
-    for ($i = 0; $i < count($list_combos); $i = $i + 1)
-        if (count($list_combos[$i]) == count($list))
+    for ($i = 0; $i < count($list_combos); $i = $i + 1) {
+        if (count($list_combos[$i]) == count($list)) {
             array_push($list_combos_final, $list_combos[$i]);
+		}
+	}
 
 	$list_combos = $list_combos_final;
 	#print the list combinations
